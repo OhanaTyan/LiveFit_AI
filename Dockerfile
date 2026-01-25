@@ -1,12 +1,10 @@
-FROM nginx:alpine
+FROM python:3.10-slim
 
-WORKDIR /usr/share/nginx/html
+WORKDIR /app
 
-COPY ./build/web /usr/share/nginx/html
+COPY ./build/web /app
 
 EXPOSE 7860
 
-# 修改nginx配置文件，监听7860端口
-RUN sed -i 's/listen       80;/listen       7860;/g' /etc/nginx/conf.d/default.conf
-
-CMD ["nginx", "-g", "daemon off"]
+# 使用Python内置的http.server提供静态文件服务
+CMD python -m http.server 7860

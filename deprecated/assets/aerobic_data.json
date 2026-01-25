@@ -1,0 +1,272 @@
+[
+  {
+    "category": "平地走 *按步数或速度计算均可",
+    "variant": "每走一万步",
+    "calories_per_kg_per_unit": 3.8
+  },
+  {
+    "category": "平地走 *按步数或速度计算均可",
+    "variant": "每走一小时",
+    "calories_per_kg_per_unit": 3.8
+  },
+  {
+    "category": "爬坡走",
+    "variant": "坡度5°（一般选择）",
+    "calories_per_kg_per_unit": 5.5
+  },
+  {
+    "category": "爬坡走",
+    "variant": "坡度10°（很累）",
+    "calories_per_kg_per_unit": 8.0
+  },
+  {
+    "category": "跑步",
+    "variant": "6",
+    "calories_per_kg_per_unit": 5.5
+  },
+  {
+    "category": "跑步",
+    "variant": "7",
+    "calories_per_kg_per_unit": 7.2
+  },
+  {
+    "category": "跑步",
+    "variant": "8",
+    "calories_per_kg_per_unit": 9.5
+  },
+  {
+    "category": "跑步",
+    "variant": "9",
+    "calories_per_kg_per_unit": 9.6
+  },
+  {
+    "category": "跑步",
+    "variant": "9.66",
+    "calories_per_kg_per_unit": 9.768
+  },
+  {
+    "category": "跑步",
+    "variant": "12",
+    "calories_per_kg_per_unit": 10.1
+  },
+  {
+    "category": "跑步",
+    "variant": "13",
+    "calories_per_kg_per_unit": 10.1
+  },
+  {
+    "category": "跑步",
+    "variant": "14",
+    "calories_per_kg_per_unit": 10.4
+  },
+  {
+    "category": "跑步",
+    "variant": "15",
+    "calories_per_kg_per_unit": 10.9
+  },
+  {
+    "category": "跑步",
+    "variant": "16",
+    "calories_per_kg_per_unit": 12.7
+  },
+  {
+    "category": "户外骑行 *通勤类骑速10-20km/h *专业骑行速度>20km/h",
+    "variant": "10",
+    "calories_per_kg_per_unit": 3.6
+  },
+  {
+    "category": "户外骑行 *通勤类骑速10-20km/h *专业骑行速度>20km/h",
+    "variant": "12",
+    "calories_per_kg_per_unit": 3.9
+  },
+  {
+    "category": "户外骑行 *通勤类骑速10-20km/h *专业骑行速度>20km/h",
+    "variant": "13",
+    "calories_per_kg_per_unit": 4.4
+  },
+  {
+    "category": "户外骑行 *通勤类骑速10-20km/h *专业骑行速度>20km/h",
+    "variant": "15",
+    "calories_per_kg_per_unit": 5.5
+  },
+  {
+    "category": "户外骑行 *通勤类骑速10-20km/h *专业骑行速度>20km/h",
+    "variant": "18",
+    "calories_per_kg_per_unit": 6.5
+  },
+  {
+    "category": "户外骑行 *通勤类骑速10-20km/h *专业骑行速度>20km/h",
+    "variant": "27",
+    "calories_per_kg_per_unit": 7.5
+  },
+  {
+    "category": "户外骑行 *通勤类骑速10-20km/h *专业骑行速度>20km/h",
+    "variant": "31",
+    "calories_per_kg_per_unit": 10.0
+  },
+  {
+    "category": "户外骑行 *通勤类骑速10-20km/h *专业骑行速度>20km/h",
+    "variant": "34",
+    "calories_per_kg_per_unit": 12.0
+  },
+  {
+    "category": "室内单车",
+    "variant": "功率50-90W",
+    "calories_per_kg_per_unit": 4.8
+  },
+  {
+    "category": "室内单车",
+    "variant": "功率90-100W",
+    "calories_per_kg_per_unit": 6.8
+  },
+  {
+    "category": "室内单车",
+    "variant": "功率100-160W",
+    "calories_per_kg_per_unit": 8.8
+  },
+  {
+    "category": "室内单车",
+    "variant": "功率160-200W",
+    "calories_per_kg_per_unit": 11.0
+  },
+  {
+    "category": "室内单车",
+    "variant": "功率200-270W",
+    "calories_per_kg_per_unit": 14.0
+  },
+  {
+    "category": "游泳 *休息时间不要计入",
+    "variant": "1.09728",
+    "calories_per_kg_per_unit": 4.224
+  },
+  {
+    "category": "游泳 *休息时间不要计入",
+    "variant": "2.46888",
+    "calories_per_kg_per_unit": 7.656
+  },
+  {
+    "category": "游泳 *休息时间不要计入",
+    "variant": "2.7432",
+    "calories_per_kg_per_unit": 9.24
+  },
+  {
+    "category": "球类 *休息时间不要计入",
+    "variant": "篮球",
+    "calories_per_kg_per_unit": 6.1
+  },
+  {
+    "category": "球类 *休息时间不要计入",
+    "variant": "足球",
+    "calories_per_kg_per_unit": 7.0
+  },
+  {
+    "category": "球类 *休息时间不要计入",
+    "variant": "排球",
+    "calories_per_kg_per_unit": 4.1
+  },
+  {
+    "category": "球类 *休息时间不要计入",
+    "variant": "网球",
+    "calories_per_kg_per_unit": 8.9
+  },
+  {
+    "category": "球类 *休息时间不要计入",
+    "variant": "乒乓球",
+    "calories_per_kg_per_unit": 6.6
+  },
+  {
+    "category": "球类 *休息时间不要计入",
+    "variant": "羽毛球",
+    "calories_per_kg_per_unit": 7.4
+  },
+  {
+    "category": "跳操跟练 *休息时间不要计入",
+    "variant": "轻松强度",
+    "calories_per_kg_per_unit": 2.3
+  },
+  {
+    "category": "跳操跟练 *休息时间不要计入",
+    "variant": "中等强度",
+    "calories_per_kg_per_unit": 4.0
+  },
+  {
+    "category": "跳操跟练 *休息时间不要计入",
+    "variant": "剧烈强度",
+    "calories_per_kg_per_unit": 6.0
+  },
+  {
+    "category": "室内其他项目",
+    "variant": "瑜伽",
+    "calories_per_kg_per_unit": 3.1
+  },
+  {
+    "category": "室内其他项目",
+    "variant": "舞蹈",
+    "calories_per_kg_per_unit": 5.0
+  },
+  {
+    "category": "室内其他项目",
+    "variant": "椭圆仪",
+    "calories_per_kg_per_unit": 5.0
+  },
+  {
+    "category": "室内其他项目",
+    "variant": "普拉提",
+    "calories_per_kg_per_unit": 3.0
+  },
+  {
+    "category": "室内其他项目",
+    "variant": "健身环",
+    "calories_per_kg_per_unit": 5.0
+  },
+  {
+    "category": "爬楼 *速度90步/分钟",
+    "variant": "上楼",
+    "calories_per_kg_per_unit": 8.0
+  },
+  {
+    "category": "爬楼 *速度90步/分钟",
+    "variant": "下楼",
+    "calories_per_kg_per_unit": 3.1
+  },
+  {
+    "category": "划船机",
+    "variant": "功率100W",
+    "calories_per_kg_per_unit": 7.0
+  },
+  {
+    "category": "划船机",
+    "variant": "功率150W",
+    "calories_per_kg_per_unit": 8.5
+  },
+  {
+    "category": "划船机",
+    "variant": "功率200W",
+    "calories_per_kg_per_unit": 12.0
+  },
+  {
+    "category": "拳击",
+    "variant": "打沙袋",
+    "calories_per_kg_per_unit": 5.5
+  },
+  {
+    "category": "拳击",
+    "variant": "真人格斗",
+    "calories_per_kg_per_unit": 7.8
+  },
+  {
+    "category": "跳绳",
+    "variant": "<100次/分钟",
+    "calories_per_kg_per_unit": 8.8
+  },
+  {
+    "category": "跳绳",
+    "variant": "100-120次/分钟",
+    "calories_per_kg_per_unit": 11.8
+  },
+  {
+    "category": "跳绳",
+    "variant": "120-160次/分钟",
+    "calories_per_kg_per_unit": 12.3
+  }
+]

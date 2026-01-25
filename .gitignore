@@ -40,9 +40,14 @@ Thumbs.db
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
 /coverage/
 /web/
+
+# Allow build/web for deployment
+!/build/
+/build/**
+!/build/web/
+!/build/web/**
 
 # Symbolication related
 app.*.symbols

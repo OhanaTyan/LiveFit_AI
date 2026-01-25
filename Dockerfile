@@ -4,8 +4,6 @@ WORKDIR /home/user/app
 
 COPY ./build/web /home/user/app
 
-RUN pip install -r requirements.txt
-
-# 使用Python的http.server来提供静态文件
+# 使用Python的http.server来提供静态文件，不需要额外安装库
 EXPOSE 7860
 CMD ["python", "-m", "http.server", "7860"]

@@ -12,6 +12,7 @@ import '../../../weather/presentation/widgets/weather_expandable_card.dart';
 import '../../../weather/presentation/widgets/exercise_recommendation_card.dart';
 import '../../../weather/presentation/widgets/weather_settings_sheet.dart';
 import '../../../schedule/domain/models/schedule_event.dart';
+import '../../../ai/presentation/pages/ai_page.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
 import '../../../profile/presentation/profile_edit_screen.dart';
 
@@ -146,6 +147,8 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           // Schedule Page
           const SchedulePage(),
+          // AI Page
+          const AiPage(),
           // Statistics Page
           const StatisticsPage(),
           // Settings / Profile Page
@@ -189,6 +192,14 @@ class _DashboardPageState extends State<DashboardPage> {
                 color: AppColors.primary,
               ),
               label: l10n.navSchedule,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.auto_awesome_outlined),
+              selectedIcon: const Icon(
+                Icons.auto_awesome,
+                color: AppColors.primary,
+              ),
+              label: l10n.navAi,
             ),
             NavigationDestination(
               icon: const Icon(Icons.bar_chart_outlined),

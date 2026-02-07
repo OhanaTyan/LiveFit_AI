@@ -12,8 +12,8 @@ class SiliconFlowService implements AiService {
   static const String _model = 'deepseek-ai/DeepSeek-V3'; 
 
   @override
-  Future<String> sendMessage(List<ChatMessage> history, String message) async {
-    final messages = _buildMessages(history, message);
+  Future<String> sendMessage(List<ChatMessage> history, String message, {String? systemContext}) async {
+    final messages = _buildMessages(history, message, systemContext);
 
     try {
       log.info('Sending request to SiliconFlow API...');
@@ -50,24 +50,31 @@ class SiliconFlowService implements AiService {
   }
 
   @override
-  Stream<String> streamMessage(List<ChatMessage> history, String message) async* {
+  Stream<String> streamMessage(List<ChatMessage> history, String message, {String? systemContext}) async* {
     // 暂时回退到非流式调用，但在 Stream 中返回
     // 未来可在此处实现 SSE 解析
     try {
-      final content = await sendMessage(history, message);
+      final content = await sendMessage(history, message, systemContext: systemContext);
       yield content;
     } catch (e) {
       yield 'Error: $e';
     }
   }
 
-  List<Map<String, String>> _buildMessages(List<ChatMessage> history, String currentMessage) {
+  List<Map<String, String>> _buildMessages(List<ChatMessage> history, String currentMessage, String? systemContext) {
     final List<Map<String, String>> messages = [];
     
-    // System Prompt
+    // Base System Prompt
+    String systemPrompt = '你是 LifeFit AI，一个专业的日程管理和健身助手。请用中文回答用户的问题，语气亲切自然，专注于帮助用户规划日程和提供运动建议。';
+    
+    // Append Context if available
+    if (systemContext != null && systemContext.isNotEmpty) {
+      systemPrompt += '\n\n当前用户上下文信息（请基于此信息提供个性化建议）：\n$systemContext';
+    }
+
     messages.add({
       'role': 'system',
-      'content': '你是 LifeFit AI，一个专业的日程管理和健身助手。请用中文回答用户的问题，语气亲切自然，专注于帮助用户规划日程和提供运动建议。',
+      'content': systemPrompt,
     });
 
     // History (限制最近 10 条以节省 Token)

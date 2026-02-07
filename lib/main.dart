@@ -59,10 +59,10 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => UserProfileProvider()),
-        ChangeNotifierProvider(
-          // 使用 EchoService 进行测试，如果需要真实 AI 对话请切换回 SiliconFlowService
+        ChangeNotifierProxyProvider<UserProfileProvider, ChatProvider>(
           create: (_) => ChatProvider(SiliconFlowService()),
-          // create: (_) => ChatProvider(EchoService()),
+          update: (_, userProfileProvider, chatProvider) => 
+            chatProvider!..updateUserProfileProvider(userProfileProvider),
         ),
         ChangeNotifierProvider(
           create: (_) {

@@ -1,8 +1,12 @@
+import 'dart:convert';
+import '../../../../core/services/event_bus_service.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
 import '../../domain/models/chat_message.dart';
 import '../../domain/services/ai_service.dart';
+import '../../../schedule/domain/models/schedule_event.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class ChatProvider extends ChangeNotifier {
   final AiService _aiService;
@@ -38,13 +42,94 @@ class ChatProvider extends ChangeNotifier {
       final history = _messages.sublist(0, _messages.length - 1);
       final response = await _aiService.sendMessage(history, content, systemContext: context);
       
-      final aiMessage = ChatMessage.ai(response);
-      _messages.add(aiMessage);
+      // 解析响应是否包含工具调用
+      final toolCall = _parseToolCall(response);
+      
+      if (toolCall != null) {
+        // 如果是工具调用，content 只显示 reason，保留 toolCall 数据
+        final aiMessage = ChatMessage.ai(
+          toolCall['reason'] ?? '建议更新您的日程',
+          toolCall: toolCall,
+        );
+        _messages.add(aiMessage);
+      } else {
+        final aiMessage = ChatMessage.ai(response);
+        _messages.add(aiMessage);
+      }
     } catch (e) {
       final errorMessage = ChatMessage.ai('抱歉，我暂时无法回答。请检查网络或 Token 设置。\n错误详情: $e', isError: true);
       _messages.add(errorMessage);
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Map<String, dynamic>? _parseToolCall(String response) {
+    try {
+      // 查找 json 代码块
+      final jsonStart = response.indexOf('```json');
+      if (jsonStart == -1) return null;
+      
+      final jsonEnd = response.indexOf('```', jsonStart + 7);
+      if (jsonEnd == -1) return null;
+      
+      final jsonStr = response.substring(jsonStart + 7, jsonEnd).trim();
+      final json = jsonDecode(jsonStr);
+      
+      if (json is Map<String, dynamic> && json['tool_call'] == 'manage_schedule') {
+        return json;
+      }
+    } catch (e) {
+      print('解析工具调用失败: $e');
+    }
+    return null;
+  }
+
+  Future<void> confirmToolCall(ChatMessage message) async {
+    if (message.toolCall == null) return;
+    
+    final toolCall = message.toolCall!;
+    final action = toolCall['action'];
+    final eventData = toolCall['event'];
+    
+    try {
+      final now = DateTime.now();
+      final event = ScheduleEvent(
+        id: '${now.millisecondsSinceEpoch}', // 简单生成ID，实际可能需要更复杂逻辑
+        title: eventData['title'] ?? '未命名事件',
+        description: eventData['description'] ?? '',
+        startTime: DateTime.parse(eventData['startTime']),
+        endTime: DateTime.parse(eventData['endTime']),
+        type: EventType.values.firstWhere(
+          (e) => e.name == eventData['type'],
+          orElse: () => EventType.life,
+        ),
+        color: AppColors.primary, // 默认颜色
+      );
+
+      // 加载现有事件
+      final existingEvents = await _storageService.loadActiveEvents() ?? [];
+      
+      if (action == 'create') {
+        existingEvents.add(event);
+      } else if (action == 'update') {
+        // 简单实现：先删后加，或者根据ID查找（这里假设是创建新事件来替代）
+        // 实际场景可能需要更复杂的ID匹配逻辑，这里简化为添加
+        existingEvents.add(event);
+      }
+      
+      await _storageService.saveScheduleEvents(existingEvents);
+      
+      // 通知更新
+      EventBusService().fireEvent(EventBusService.eventScheduleUpdated);
+      
+      // 添加系统消息确认
+      _messages.add(ChatMessage.ai('✅ 已为您${action == 'create' ? '添加' : '更新'}日程：${event.title}'));
+      notifyListeners();
+      
+    } catch (e) {
+      _messages.add(ChatMessage.ai('❌ 操作失败: $e', isError: true));
       notifyListeners();
     }
   }

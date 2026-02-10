@@ -6,6 +6,7 @@ class ChatMessage {
   final MessageType type;
   final DateTime timestamp;
   final bool isError;
+  final Map<String, dynamic>? toolCall;
 
   ChatMessage({
     required this.id,
@@ -13,6 +14,7 @@ class ChatMessage {
     required this.type,
     required this.timestamp,
     this.isError = false,
+    this.toolCall,
   });
 
   factory ChatMessage.user(String content) {
@@ -24,13 +26,14 @@ class ChatMessage {
     );
   }
 
-  factory ChatMessage.ai(String content, {bool isError = false}) {
+  factory ChatMessage.ai(String content, {bool isError = false, Map<String, dynamic>? toolCall}) {
     return ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       content: content,
       type: MessageType.ai,
       timestamp: DateTime.now(),
       isError: isError,
+      toolCall: toolCall,
     );
   }
 }

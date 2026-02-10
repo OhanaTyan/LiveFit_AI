@@ -152,9 +152,29 @@ class _ManualSchedulePageState extends State<ManualSchedulePage> {
         ),
         actions: [
           IconButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const VoiceScheduleScreen()),
-            ),
+            onPressed: () async {
+              final result = await Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const VoiceScheduleScreen()),
+              );
+              
+              if (result != null && result is List<ScheduleEvent> && result.isNotEmpty) {
+                // 如果返回了日程列表，自动填充第一个日程（目前设计是一个个添加，这里取第一个）
+                // 实际逻辑：VoiceScheduleScreen 可能返回一个列表，这里我们简化处理，
+                // 如果有多个，可能需要循环添加或弹窗确认，但根据需求描述：
+                // "语音输入结束后，用户点进确定，回到手动添加日程窗口，但是已经自动帮忙添加了日程信息"
+                // 这意味着我们应该把识别到的信息填充到当前的输入框中
+                
+                final event = result.first;
+                setState(() {
+                  _titleController.text = event.title;
+                  _descriptionController.text = event.description;
+                  _selectedDate = event.startTime;
+                  _startTime = TimeOfDay.fromDateTime(event.startTime);
+                  _endTime = TimeOfDay.fromDateTime(event.endTime);
+                  _selectedType = event.type;
+                });
+              }
+            },
             icon: const Icon(Icons.mic, color: AppColors.primary),
             tooltip: '语音添加',
           ),

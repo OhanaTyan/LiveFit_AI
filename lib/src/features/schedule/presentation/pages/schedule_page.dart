@@ -9,6 +9,7 @@ import '../../../../core/services/storage_service.dart';
 import '../../../../core/services/operation_log_service.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../voice_schedule/presentation/screens/voice_schedule_screen.dart';
+import 'manual_schedule_page.dart';
 
 enum ViewType { calendar, list }
 
@@ -657,7 +658,25 @@ class _SchedulePageState extends State<SchedulePage>
           : FloatingActionButton(
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => VoiceScheduleScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => ManualSchedulePage(
+                      onSave: (newEvent) async {
+                        final storageService = StorageService();
+                        final List<ScheduleEvent> existingEvents =
+                            await storageService.loadActiveEvents() ?? <ScheduleEvent>[];
+                        final List<ScheduleEvent> updatedEvents = <ScheduleEvent>[...existingEvents, newEvent];
+                        await storageService.saveScheduleEvents(updatedEvents);
+                        EventBusService().fireEvent(
+                          EventBusService.eventScheduleUpdated,
+                        );
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('日程保存成功')),
+                          );
+                        }
+                      },
+                    ),
+                  ),
                 );
               },
               backgroundColor: AppColors.modernBlue.primary,

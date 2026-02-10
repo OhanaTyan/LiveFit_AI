@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/services/aliyun_voice_recognition_service.dart';
@@ -6,7 +7,9 @@ import '../../../../core/services/local_voice_recognition_optimized.dart';
 import '../../../../core/services/nlp_service.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../../../core/services/event_bus_service.dart';
-import '../../../../core/services/ai_service.dart';
+import '../../../ai/domain/services/ai_service.dart';
+import '../../../ai/data/services/silicon_flow_service.dart';
+import '../../../ai/domain/models/chat_message.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../schedule/domain/models/schedule_event.dart';
 import '../../../schedule/presentation/pages/schedule_edit_page.dart';
@@ -30,9 +33,10 @@ class _VoiceScheduleScreenState extends State<VoiceScheduleScreen> {
   final OptimizedLocalVoiceRecognitionService _fallbackVoiceService =
       OptimizedLocalVoiceRecognitionService();
   final NlpService _nlpService = NlpService();
-  final AiService _aiService = AiService();
+  final AiService _aiService = SiliconFlowService();
   final StorageService _storageService = StorageService();
   final ScheduleConflictDetector _conflictDetector = ScheduleConflictDetector();
+  final TextEditingController _textInputController = TextEditingController();
   bool _isListening = false;
   bool _isProcessing = false;
   bool _isOnline = false; // 初始化为false，避免在网络检查完成前尝试初始化语音服务
@@ -49,6 +53,12 @@ class _VoiceScheduleScreenState extends State<VoiceScheduleScreen> {
   void initState() {
     super.initState();
     _initializeScreen();
+  }
+
+  @override
+  void dispose() {
+    _textInputController.dispose();
+    super.dispose();
   }
 
   /// 初始化屏幕，按顺序执行初始化操作
@@ -280,10 +290,30 @@ class _VoiceScheduleScreenState extends State<VoiceScheduleScreen> {
     await _processRecognizedText();
   }
 
+  Future<void> _handleTextSubmit() async {
+    final text = _textInputController.text.trim();
+    if (text.isEmpty) return;
+
+    _textInputController.clear();
+    setState(() {
+      _recognizedText = text;
+      _isProcessing = true;
+    });
+
+    // Close keyboard
+    FocusScope.of(context).unfocus();
+
+    await _processRecognizedText();
+  }
+
   Future<void> _processRecognizedText() async {
     try {
       // 检查网络状态
       await _checkNetworkStatus();
+      final isOnline = await _aiService.isConnected();
+      setState(() {
+        _isOnline = isOnline;
+      });
 
       if (!_isOnline) {
         setState(() {
@@ -316,10 +346,9 @@ class _VoiceScheduleScreenState extends State<VoiceScheduleScreen> {
         return;
       }
 
-      // 使用AI服务解析文本
-      final extractedEvents = await _aiService.extractScheduleEvents(
-        textToProcess,
-      );
+      // 使用 SiliconFlow 服务解析文本
+      final extractedEvents = await _aiService.extractScheduleEvents(textToProcess);
+
       final scheduleEvents = extractedEvents
           .map((event) => _nlpService.toScheduleEvent(event))
           .toList();
@@ -666,9 +695,9 @@ class _VoiceScheduleScreenState extends State<VoiceScheduleScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              // Implement actual import logic
-              Navigator.pop(context);
-              _importSchedules();
+              // 返回生成的日程列表，而不是直接保存
+              Navigator.pop(context); // Close dialog
+              Navigator.pop(context, _generatedSchedules); // Return result to previous screen
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
             child: Text('导入'),
@@ -678,7 +707,8 @@ class _VoiceScheduleScreenState extends State<VoiceScheduleScreen> {
     );
   }
 
-  // Import schedules to main schedule
+  // Import schedules to main schedule - DEPRECATED: logic moved to manual schedule page
+  /*
   Future<void> _importSchedules() async {
     List<ScheduleEvent> eventsToImport = [];
 
@@ -733,6 +763,7 @@ class _VoiceScheduleScreenState extends State<VoiceScheduleScreen> {
       ).showSnackBar(SnackBar(content: Text('没有可导入的事件')));
     }
   }
+  */
 
   // Handle schedule conflicts
   Future<bool> _handleConflict(
@@ -960,27 +991,79 @@ class _VoiceScheduleScreenState extends State<VoiceScheduleScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(32),
-      child: SizedBox(
-        width: 80,
-        height: 80,
-        child: GestureDetector(
-          // 按下录音
-          onLongPressStart: (_) => _startListening(),
-          // 松开结束
-          onLongPressEnd: (_) => _stopListening(),
-          child: FloatingActionButton(
-            onPressed: () {}, // 禁用点击，只允许长按
-            backgroundColor: _isListening ? AppColors.error : AppColors.primary,
-            elevation: 4,
-            shape: const CircleBorder(),
-            child: Icon(
-              _isListening ? Icons.stop : Icons.mic,
-              size: 36,
-              color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Text Input Row
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _textInputController,
+                  decoration: InputDecoration(
+                    hintText: '或者直接输入您的计划...',
+                    hintStyle: TextStyle(color: AppColors.textDisabled),
+                    filled: true,
+                    fillColor: Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.surfaceDark
+                        : Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(24),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                  ),
+                  onSubmitted: (_) => _handleTextSubmit(),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                onPressed: _handleTextSubmit,
+                icon: const Icon(Icons.send),
+                color: AppColors.primary,
+                style: IconButton.styleFrom(
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          
+          // Voice Button
+          SizedBox(
+            width: 80,
+            height: 80,
+            child: GestureDetector(
+              // 按下录音
+              onLongPressStart: (_) => _startListening(),
+              // 松开结束
+              onLongPressEnd: (_) => _stopListening(),
+              child: FloatingActionButton(
+                onPressed: () {}, // 禁用点击，只允许长按
+                backgroundColor: _isListening ? AppColors.error : AppColors.primary,
+                elevation: 4,
+                shape: const CircleBorder(),
+                child: Icon(
+                  _isListening ? Icons.stop : Icons.mic,
+                  size: 36,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
-        ),
+          const SizedBox(height: 8),
+          Text(
+            _isListening ? '松开结束' : '长按说话',
+            style: TextStyle(
+              color: AppColors.textDisabled,
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }

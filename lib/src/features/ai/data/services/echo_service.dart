@@ -14,4 +14,31 @@ class EchoService implements AiService {
     await Future.delayed(const Duration(seconds: 1));
     yield 'Echo: $message';
   }
+
+  @override
+  Future<bool> isConnected() async {
+    return true;
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> extractScheduleEvents(String text) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return [];
+  }
+
+  @override
+  Future<Map<String, dynamic>?> parseSingleEvent(String text) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return null;
+  }
+
+  @override
+  Future<String> generateClarificationQuestion(
+    String ambiguityType,
+    Map<String, dynamic> schedule,
+    String originalText,
+  ) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return '这是一个模拟的澄清问题。';
+  }
 }

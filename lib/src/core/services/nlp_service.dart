@@ -170,16 +170,88 @@ class NlpService {
   
   // Convert extracted event to ScheduleEvent model
   ScheduleEvent toScheduleEvent(Map<String, dynamic> extractedEvent) {
+    // Parse start time
+    DateTime startTime;
+    if (extractedEvent['startTime'] is DateTime) {
+      startTime = extractedEvent['startTime'];
+    } else if (extractedEvent['startTime'] is String) {
+      try {
+        startTime = DateTime.parse(extractedEvent['startTime']);
+      } catch (e) {
+        startTime = DateTime.now();
+      }
+    } else {
+      startTime = DateTime.now();
+    }
+
+    // Parse end time
+    DateTime endTime;
+    if (extractedEvent['endTime'] is DateTime) {
+      endTime = extractedEvent['endTime'];
+    } else if (extractedEvent['endTime'] is String) {
+      try {
+        endTime = DateTime.parse(extractedEvent['endTime']);
+      } catch (e) {
+        endTime = startTime.add(const Duration(hours: 1));
+      }
+    } else {
+      endTime = startTime.add(const Duration(hours: 1));
+    }
+
+    // Parse type
+    EventType type;
+    if (extractedEvent['type'] is String) {
+      try {
+        type = EventType.values.firstWhere(
+          (e) => e.name == extractedEvent['type'],
+          orElse: () => _determineEventType(extractedEvent['title'] ?? ''),
+        );
+      } catch (e) {
+        type = _determineEventType(extractedEvent['title'] ?? '');
+      }
+    } else {
+      type = _determineEventType(extractedEvent['title'] ?? '');
+    }
+
+    // Parse priority
+    EventPriority priority = EventPriority.medium;
+    if (extractedEvent['priority'] is String) {
+      try {
+        priority = EventPriority.values.firstWhere(
+          (e) => e.name == extractedEvent['priority'],
+          orElse: () => EventPriority.medium,
+        );
+      } catch (e) {
+        priority = EventPriority.medium;
+      }
+    }
+
     return ScheduleEvent(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: extractedEvent['title'] ?? '未命名事件',
       description: extractedEvent['description'] ?? '',
-      startTime: extractedEvent['startTime'] ?? DateTime.now(),
-      endTime: extractedEvent['endTime'] ?? DateTime.now().add(const Duration(hours: 1)),
-      type: _determineEventType(extractedEvent['title'] ?? ''),
-      color: _getColorForEventType(extractedEvent['title'] ?? ''),
+      startTime: startTime,
+      endTime: endTime,
+      type: type,
+      color: _getColorForType(type),
       isCompleted: false,
+      priority: priority,
+      location: extractedEvent['location'],
     );
+  }
+
+  Color _getColorForType(EventType type) {
+    switch (type) {
+      case EventType.work:
+        return Colors.blue;
+      case EventType.workout:
+        return Colors.green;
+      case EventType.rest:
+        return Colors.orange;
+      case EventType.life:
+      default:
+        return Colors.pinkAccent;
+    }
   }
   
   EventType _determineEventType(String title) {
